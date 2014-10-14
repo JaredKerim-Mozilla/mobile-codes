@@ -11,7 +11,7 @@ from BeautifulSoup import BeautifulSoup
 from mobile_codes import Operator
 
 
-def parse_wikipedia():
+def parse_mnc_wikipedia():
     with open('List_of_mobile_country_codes', 'r') as htmlfile:
         soup = BeautifulSoup(htmlfile)
         operators = []
@@ -27,7 +27,7 @@ def parse_wikipedia():
         return operators
 
 
-def parse_itu():
+def parse_mnc_itu():
     with open(os.path.join('csv', 'itu.csv'), 'rb') as csvfile:
         reader = csv.reader(csvfile)
         operators = []
@@ -36,14 +36,25 @@ def parse_itu():
             if not line[0]:
                 operator_name = line[1]
                 mcc, mnc = line[2].split()
-                operators.append(Operator(operator=operator_name, brand=operator_name, mcc=mcc, mnc=mnc))
+                operators.append(MNCOperator(operator=operator_name, brand=operator_name, mcc=mcc, mnc=mnc))
+
+        return operators
+
+def parse_sid_ifast():
+    with open(os.path.join('csv', 'nationalsid.csv'), 'rb') as csvfile:
+        reader = csv.reader(csvfile)
+        operators = []
+
+        for line in reader:
+            operators.append(SIDOperator(*line)
 
         return operators
 
 
+
 def merge_wiki_itu():
-    wiki_operators = parse_wikipedia()
-    itu_operators = parse_itu()
+    wiki_operators = parse_mnc_wikipedia()
+    itu_operators = parse_mnc_itu()
     merged_operators = {}
 
     for operator in wiki_operators:
@@ -57,10 +68,12 @@ def merge_wiki_itu():
     return merged_operators.values()
 
 
-def write_operators(operators):
-    with open('mobile_codes/json/operators.json', 'wb') as outfile:
-        outfile.write(json.dumps(operators))
+def write_mnc_operators(mnc_operators):
+    with open('mobile_codes/json/mnc_operators.json', 'wb') as outfile:
+        outfile.write(json.dumps(mnc_operators))
+
+def write_sid_operators(operators):
 
 
 if __name__ == '__main__':
-    write_operators(merge_wiki_itu())
+    write_mnc_operators(merge_wiki_itu())

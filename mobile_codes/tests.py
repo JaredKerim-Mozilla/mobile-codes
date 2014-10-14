@@ -58,7 +58,7 @@ class TestCountries(TestCase):
         self.assertRaises(KeyError, mobile_codes.numeric, u'000')
 
     def test_countries_match_operators(self):
-        operators = mobile_codes._operators()
+        operators = mobile_codes._mnc_operators()
         operator_mccs = set([o.mcc for o in operators])
         # exclude test / worldwide mcc values
         operator_mccs -= set([u'001', u'901'])
